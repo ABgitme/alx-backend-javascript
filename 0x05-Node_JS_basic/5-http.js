@@ -20,21 +20,18 @@ const app = http.createServer((req, res) => {
     res.write('This is the list of our students\n');
 
     // Get the database file path from the command-line argument
-    const database = process.argv[2];
+    const database = process.argv.length > 2 ? process.argv[2] : '';
 
-    // Use countStudents to read and process the database
-    countStudents(database)
-      .then(() => {
-        res.end();
-      })
-      .catch((err) => {
-        res.end(`${err.message}\n`);
-      });
-  } else {
-    // Handle undefined paths with a 404 error
-    res.statusCode = 404;
-    res.end('Not Found\n');
+    res.write('This is the list of our students\n');
+    try {
+      const students = await countStudents(database);
+      res.end(`${students.join('\n')}`);
+    } catch (error) {
+      res.end(error.message);
+    }
   }
+  res.statusCode = 404;
+  res.end();
 });
 
 // Listen on port 1245
