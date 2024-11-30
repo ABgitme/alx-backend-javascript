@@ -30,6 +30,13 @@ describe('GET /cart/:id', function() {
     });
   });
 
+  it('should have correct content for correct url', function(done) {
+    request.get('http://localhost:7865/cart/10', function(err, res, body) {
+      expect(body).to.contain('Payment methods for cart 10');
+      done();
+    });
+  });
+
   // Test when :id is NOT a number (404 case)
   it('should return status code 404 for invalid id', function(done) {
     request('http://localhost:7865/cart/abc', (error, response, body) => {
