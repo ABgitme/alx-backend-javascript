@@ -1,40 +1,29 @@
 const http = require('http');
-const url = require('url');
+
+const args = process.argv.slice(2);
 const countStudents = require('./3-read_file_async');
 
-// Create the HTTP server
-const app = http.createServer((req, res) => {
-  // Parse the request URL
-  const parsedUrl = url.parse(req.url, true);
-  // Set the response content type to plain text
+const DATABASE = args[0];
+
+const app = http.createServer(async (req, res) => {
+  res.statusCode = 200;
   res.setHeader('Content-Type', 'text/plain');
 
-  if (parsedUrl.pathname === '/') {
-    res.statusCode = 200;
+  const { url } = req;
+
+  if (url === '/') {
     res.write('Hello Holberton School!');
-    res.end();
-  } else if (parsedUrl.pathname === '/students') {
-    // Handle the /students path
-    res.statusCode = 200;
+  } else if (url === '/students') {
     res.write('This is the list of our students\n');
-
-    // Get the database file path from the command-line argument
-    const database = process.argv[2].toString();
-
-    // Use countStudents to read and process the database
-    countStudents(database)
-      .then((output) => {
-        // End the response to Terminal 2 (client terminal)
-        res.end(output.slice(0, -1));
-      })
-      .catch(() => {
-        // Log error to Terminal 1 (server terminal)
-        res.statusCode = 404;
-
-        // Respond with the error message to Terminal 2
-        res.end('Cannot load the database');
-      });
+    try {
+      const students = await countStudents(DATABASE);
+      res.end(`${students.join('\n')}`);
+    } catch (error) {
+      res.end(error.message);
+    }
   }
+  res.statusCode = 404;
+  res.end();
 });
 
 // Listen on port 1245
