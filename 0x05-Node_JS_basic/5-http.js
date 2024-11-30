@@ -19,28 +19,21 @@ const app = http.createServer((req, res) => {
     res.write('This is the list of our students\n');
 
     // Get the database file path from the command-line argument
-    const database = process.argv[2];
+    const database = process.argv[2].toString();
 
     // Use countStudents to read and process the database
     countStudents(database)
       .then((output) => {
-        // Log detailed output to Terminal 1 (server terminal)
-        console.log(output);
-
         // End the response to Terminal 2 (client terminal)
-        res.end();
+        res.end(output.slice(0, -1));
       })
-      .catch((err) => {
+      .catch(() => {
         // Log error to Terminal 1 (server terminal)
-        console.error(err.message);
+        res.statusCode = 404;
 
         // Respond with the error message to Terminal 2
-        res.end(`${err.message}\n`);
+        res.end('Cannot load the database');
       });
-  } else {
-    // Handle undefined paths with a 404 error
-    res.statusCode = 404;
-    res.end('Not Found\n');
   }
 });
 
