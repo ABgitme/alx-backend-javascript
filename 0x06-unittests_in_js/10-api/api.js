@@ -11,7 +11,7 @@ app.get('/', (req, res) => {
 });
 
 // Define the route for GET /cart/:id
-app.get('/cart/:id', (req, res) => {
+app.get('/cart/:id([0-9]+)', (req, res) => {
   const cartId = req.params.id;
 
   // Check if the cartId is a valid number using regex
@@ -27,8 +27,8 @@ app.get('/available_payments', (req, res) => {
   res.json({
     payment_methods: {
       credit_cards: true,
-      paypal: false
-    }
+      paypal: false,
+    },
   });
 });
 
